@@ -4,7 +4,7 @@ img {
 
 .landing {
   position: relative;
-  background: url('./img/dev2.jpg') no-repeat;
+  background: url("./img/dev2.jpg") no-repeat;
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -14,6 +14,10 @@ img {
 
 .landing-inner {
   padding-top: 80px;
+}
+
+.create-profile{
+  margin-bottom: 100px;
 }
 
 .dark-overlay {
@@ -36,4 +40,14 @@ img {
 
 .form-control::placeholder {
   color: #bbb !important;
+}
+
+
+
+
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
