@@ -28,7 +28,7 @@
   "engines": {
     "npm": "6.x",
     "node": "14.x"
-}
+},
   "devDependencies": {
     "nodemon": "^1.17.3"
   }
