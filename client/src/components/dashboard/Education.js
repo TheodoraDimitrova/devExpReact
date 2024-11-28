@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Moment from 'react-moment';
-import { deleteEducation } from '../../actions/profileActions';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import dayjs from "dayjs";
+import { deleteEducation } from "../../actions/profileActions";
 
 class Education extends Component {
   onDeleteClick(id) {
@@ -10,16 +10,16 @@ class Education extends Component {
   }
 
   render() {
-    const education = this.props.education.map(edu => (
+    const education = this.props.education.map((edu) => (
       <tr key={edu._id}>
         <td>{edu.school}</td>
         <td>{edu.degree}</td>
         <td>
-          <Moment format="YYYY/MM/DD">{edu.from}</Moment> -
+          <span>{dayjs(edu.from).format("YYYY/MM/DD")}</span> -
           {edu.to === null ? (
-            ' Now'
+            " Now"
           ) : (
-            <Moment format="YYYY/MM/DD">{edu.to}</Moment>
+            <span>{dayjs(edu.to).format("YYYY/MM/DD")}</span>
           )}
         </td>
         <td>
@@ -52,7 +52,7 @@ class Education extends Component {
 }
 
 Education.propTypes = {
-  deleteEducation: PropTypes.func.isRequired
+  deleteEducation: PropTypes.func.isRequired,
 };
 
 export default connect(null, { deleteEducation })(Education);

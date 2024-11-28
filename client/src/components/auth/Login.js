@@ -1,102 +1,87 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { loginUser } from '../../actions/authActions';
-import TextFieldGroup from '../common/TextFieldGroup';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../actions/authActions";
+import TextFieldGroup from "../common/TextFieldGroup";
+import { getCurrentProfile } from "../../actions/profileActions";
 
-class Login extends Component {
-  constructor() {
-    super();
-    this.state = {
-      email: '',
-      password: '',
-      errors: {}
-    };
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  componentDidMount() {
-    if (this.props.auth.isAuthenticated) {
-      this.props.history.push('/dashboard');
+  const auth = useSelector((state) => state.auth);
+  const { profile } = useSelector((state) => state.profile);
+  const errors = useSelector((state) => state.errors); // Грешки от глобалния state
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      if (profile === null) {
+        dispatch(getCurrentProfile());
+      } else if (profile && Object.keys(profile).length > 0) {
+        navigate("/dashboard");
+      } else {
+        navigate("/create-profile");
+      }
     }
-  }
+  }, [auth.isAuthenticated, profile, dispatch, navigate]);
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.auth.isAuthenticated) {
-      this.props.history.push('/dashboard');
-    }
-
-    if (nextProps.errors) {
-      this.setState({ errors: nextProps.errors });
-    }
-  }
-
-  onSubmit(e) {
+  const onSubmit = (e) => {
     e.preventDefault();
 
     const userData = {
-      email: this.state.email,
-      password: this.state.password
+      email,
+      password,
     };
 
-    this.props.loginUser(userData);
-  }
+    dispatch(loginUser(userData)); // Изпраща потребителските данни за логин
+  };
 
-  onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-  }
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "email") {
+      setEmail(value);
+    } else if (name === "password") {
+      setPassword(value);
+    }
+  };
 
-  render() {
-    const { errors } = this.state;
+  return (
+    <div className="login">
+      <div className="container">
+        <div className="row">
+          <div className="col-md-8 m-auto">
+            <h1 className="display-4 text-center">Log In</h1>
+            <p className="lead text-center">
+              Sign in to your DEV Experience account
+            </p>
+            <form onSubmit={onSubmit}>
+              <TextFieldGroup
+                placeholder="Email Address"
+                name="email"
+                type="email"
+                value={email}
+                onChange={onChange}
+                error={errors.email} // Грешка от Redux
+              />
 
-    return (
-      <div className="login">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-8 m-auto">
-              <h1 className="display-4 text-center">Log In</h1>
-              <p className="lead text-center">
-                Sign in to your DEV Experience account
-              </p>
-              <form onSubmit={this.onSubmit}>
-                <TextFieldGroup
-                  placeholder="Email Address"
-                  name="email"
-                  type="email"
-                  value={this.state.email}
-                  onChange={this.onChange}
-                  error={errors.email}
-                />
-
-                <TextFieldGroup
-                  placeholder="Password"
-                  name="password"
-                  type="password"
-                  value={this.state.password}
-                  onChange={this.onChange}
-                  error={errors.password}
-                />
-                <input type="submit" className="btn btn-info btn-block mt-4" />
-              </form>
-            </div>
+              <TextFieldGroup
+                placeholder="Password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={onChange}
+                error={errors.password} // Грешка от Redux
+              />
+              <input type="submit" className="btn btn-info btn-block mt-4" />
+            </form>
           </div>
         </div>
       </div>
-    );
-  }
-}
-
-Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
-  auth: state.auth,
-  errors: state.errors
-});
-
-export default connect(mapStateToProps, { loginUser })(Login);
+export default Login;

@@ -1,76 +1,73 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import ProfileHeader from './ProfileHeader';
-import ProfileAbout from './ProfileAbout';
-import ProfileCreds from './ProfileCreds';
-import ProfileGithub from './ProfileGithub';
-import Spinner from '../common/Spinner';
-import { getProfileByHandle } from '../../actions/profileActions';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import ProfileHeader from "./ProfileHeader";
+import ProfileAbout from "./ProfileAbout";
+import ProfileCreds from "./ProfileCreds";
+import ProfileGithub from "./ProfileGithub";
+import Spinner from "../common/Spinner";
+import {
+  getProfileByHandle,
+  clearCurrentProfile,
+} from "../../actions/profileActions";
 
-class Profile extends Component {
-  componentDidMount() {
-    if (this.props.match.params.handle) {
-      this.props.getProfileByHandle(this.props.match.params.handle);
+const Profile = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { handle } = useParams();
+  const { profile, loading } = useSelector((state) => state.profile);
+
+  useEffect(() => {
+    dispatch(clearCurrentProfile());
+    if (handle) {
+      dispatch(getProfileByHandle(handle));
     }
-  }
+  }, [dispatch, handle]);
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.profile.profile === null && this.props.profile.loading) {
-      this.props.history.push('/not-found');
-    }
-  }
-
-  render() {
-    const { profile, loading } = this.props.profile;
-    let profileContent;
-
-    if (profile === null || loading) {
-      profileContent = <Spinner />;
-    } else {
-      profileContent = (
-        <div>
-          <div className="row">
-            <div className="col-md-6">
-              <Link to="/profiles" className="btn btn-light mb-3 float-left">
-                Back To Profiles
-              </Link>
-            </div>
-            <div className="col-md-6" />
-          </div>
-          <ProfileHeader profile={profile} />
-          <ProfileAbout profile={profile} />
-          <ProfileCreds
-            education={profile.education}
-            experience={profile.experience}
-          />
-          {profile.githubusername ? (
-            <ProfileGithub username={profile.githubusername} />
-          ) : null}
-        </div>
-      );
-    }
-
+  if (!loading && profile === null) {
     return (
-      <div className="profile">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-12">{profileContent}</div>
-          </div>
-        </div>
+      <div className="not-found">
+        <h1>Page Not Found</h1>
+        <p>Sorry, this profile does not exist.</p>
       </div>
     );
   }
-}
 
-Profile.propTypes = {
-  getProfileByHandle: PropTypes.func.isRequired,
-  profile: PropTypes.object.isRequired
+  if (loading || profile === null) {
+    return <Spinner />;
+  }
+
+  const profileContent = (
+    <div>
+      <div className="row">
+        <div className="col-md-6">
+          <Link to="/profiles" className="btn btn-light mb-3 float-left">
+            Back To Profiles
+          </Link>
+        </div>
+        <div className="col-md-6" />
+      </div>
+      <ProfileHeader profile={profile} />
+      <ProfileAbout profile={profile} />
+      <ProfileCreds
+        education={profile.education}
+        experience={profile.experience}
+      />
+      {profile.githubusername && (
+        <ProfileGithub username={profile.githubusername} />
+      )}
+    </div>
+  );
+
+  return (
+    <div className="profile">
+      <div className="container">
+        <div className="row">
+          <div className="col-md-12">{profileContent}</div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
-  profile: state.profile
-});
-
-export default connect(mapStateToProps, { getProfileByHandle })(Profile);
+export default Profile;

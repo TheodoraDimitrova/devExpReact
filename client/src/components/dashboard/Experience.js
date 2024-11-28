@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Moment from 'react-moment';
-import { deleteExperience } from '../../actions/profileActions';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import dayjs from "dayjs"; // Импортиране на dayjs
+import { deleteExperience } from "../../actions/profileActions";
 
 class Experience extends Component {
   onDeleteClick(id) {
@@ -10,16 +10,17 @@ class Experience extends Component {
   }
 
   render() {
-    const experience = this.props.experience.map(exp => (
+    const experience = this.props.experience.map((exp) => (
       <tr key={exp._id}>
         <td>{exp.company}</td>
         <td>{exp.title}</td>
         <td>
-          <Moment format="YYYY/MM/DD">{exp.from}</Moment> -
+          {/* Използваме dayjs за форматиране на датата */}
+          <span>{dayjs(exp.from).format("YYYY/MM/DD")}</span> -
           {exp.to === null ? (
-            ' Now'
+            " Now"
           ) : (
-            <Moment format="YYYY/MM/DD">{exp.to}</Moment>
+            <span>{dayjs(exp.to).format("YYYY/MM/DD")}</span>
           )}
         </td>
         <td>
@@ -32,6 +33,7 @@ class Experience extends Component {
         </td>
       </tr>
     ));
+
     return (
       <div>
         <h4 className="mb-4">Experience Credentials</h4>
@@ -52,7 +54,7 @@ class Experience extends Component {
 }
 
 Experience.propTypes = {
-  deleteExperience: PropTypes.func.isRequired
+  deleteExperience: PropTypes.func.isRequired,
 };
 
 export default connect(null, { deleteExperience })(Experience);

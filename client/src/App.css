@@ -16,7 +16,7 @@ img {
   padding-top: 80px;
 }
 
-.create-profile{
+.create-profile {
   margin-bottom: 100px;
 }
 
@@ -42,12 +42,13 @@ img {
   color: #bbb !important;
 }
 
-
-
-
-
-footer {
+/* footer {
   position: fixed;
   bottom: 0;
   width: 100%;
+} */
+footer {
+  position: relative;
+  width: 100%;
+  margin-top: 50px;
 }
